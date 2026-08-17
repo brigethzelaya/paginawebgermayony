@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrera de Informática - IPU BTPI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;scroll-behavior:smooth;}
+  body{background:#080710;color:#e0e0e0;overflow-x:hidden;}
+
+  #bg3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;}
+  .stars{position:fixed;width:100%;height:100%;background:transparent;z-index:-1;}
+  .star{position:absolute;background:white;border-radius:50%;animation:twinkle 3s infinite;}
+  @keyframes twinkle{0%,100%{opacity:0.2;}50%{opacity:1;}}
+
+  header{display:flex;justify-content:space-between;align-items:center;padding:12px 50px;background:rgba(15,10,30,0.9);border-bottom:2px solid #4a0082;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+  .logo-area{display:flex;align-items:center;gap:20px;}
+  .logo-text{line-height:1.2;}
+  .logo-text.nombre{font-size:0.95rem;font-weight:800;color:#b388ff;}
+  .logo-text.lema{font-size:9px;color:#aaa;}
+  nav{display:flex;gap:25px;}
+  nav a{color:#ccc;text-decoration:none;font-weight:600;transition:0.3s;cursor:pointer;}
+  nav a:hover{color:#b388ff;border-bottom:2px solid #b388ff;}
+
+  .hero{display:flex;padding:80px 50px;align-items:center;gap:50px;min-height:85vh;flex-direction:column;text-align:center;}
+  .hero-text{width:100%;max-width:900px;}
+  .badge{background:#2d0055;border:1px solid #4a0082;padding:6px 18px;border-radius:20px;font-size:12px;font-weight:600;color:#d1b3ff;display:inline-block;margin-bottom:15px;}
+  h1{font-size:4.5rem;font-weight:800;margin:20px 0;color:#b388ff;text-shadow:0 0 20px rgba(179,136,255,0.5);}
+  .hero-text p{color:#aaa;font-size:1.1rem;line-height:1.7;margin-bottom:30px;}
+  .botones{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .btn{padding:14px 28px;border:none;border-radius:10px;color:#fff;cursor:pointer;font-weight:700;font-size:15px;transition:0.3s;border:2px solid transparent;}
+  .btn:hover{transform:scale(1.05);}
+  .btn-morada{background:#4a0082;border-color:#6a00c2;}
+  .btn-azul{background:#1a237e;border-color:#3949ab;}
+  .btn-verde{background:#311b92;border-color:#512da8;}
+
+  #esfera3d{width:350px;height:350px;filter:drop-shadow(0 0 25px #4a0082);margin-top:30px;}
+
+  section{padding:80px 50px;max-width:1000px;margin:auto;position:relative;z-index:10;}
+  h2{text-align:center;font-size:2.5rem;font-weight:800;margin-bottom:50px;color:#b388ff;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:25px;}
+  .card{background:#120a24;border:2px solid #2d0055;padding:25px;border-radius:15px;text-align:center;font-size:1.8rem;font-weight:800;color:#b388ff;}
+  .card span{font-size:13px;color:#999;font-weight:500;display:block;margin-top:8px;}
+
+  .info-box{background:#120a24;border:2px solid #2d0055;padding:30px;border-radius:20px;margin-bottom:30px;}
+  .info-box h3{color:#b388ff;font-size:1.5rem;margin-bottom:15px;}
+  .info-box ul{list-style:none;padding-left:0;}
+  .info-box ul li{padding:8px 0;padding-left:25px;position:relative;color:#ccc;}
+  .info-box ul li:before{content:"✓";position:absolute;left:0;color:#4a0082;font-weight:bold;font-size:18px;}
+  .info-box p{margin-bottom:15px;line-height:1.8;}
+
+  .grid-1{display:grid;grid-template-columns:1fr;gap:20px;}
+  .materia-card{background:#120a24;border:2px solid #2d0055;padding:25px;border-radius:15px;cursor:pointer;transition:0.3s;}
+  .materia-card:hover{background:#1a0f33;border-color:#4a0082;transform:translateX(10px);}
+  .materia-card h3{color:#b388ff;margin-bottom:10px;font-size:1.3rem;}
+
+  .form-box{background:#120a24;border:2px solid #2d0055;padding:30px;border-radius:20px;}
+  .form-box input,.form-box select{width:100%;padding:12px;margin:10px 0;background:#080710;border:1px solid #4a0082;border-radius:8px;color:#fff;font-size:15px;}
+  .form-box label{color:#b388ff;font-weight:600;}
+  .lista-registro{margin-top:20px;max-height:400px;overflow-y:auto;}
+  .item-registro{display:flex;align-items:center;gap:15px;background:#1a0f33;padding:15px;border-radius:10px;margin-bottom:10px;border:1px solid #2d0055;}
+  .item-registro img{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #4a0082;}
+
+  table{width:100%;border-collapse:collapse;background:#120a24;border-radius:15px;overflow:hidden;border:2px solid #2d0055;}
+  th{background:#2d0055;color:#b388ff;padding:15px;text-align:left;}
+  td{padding:15px;border-bottom:1px solid #1a0f33;}
+
+  .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.95);justify-content:center;align-items:center;backdrop-filter:blur(10px);}
+  .modal-content{background:#120a24;padding:35px;border-radius:20px;width:90%;max-width:800px;border:3px solid #4a0082;position:relative;max-height:90vh;overflow-y:auto;}
+  .close{position:absolute;top:15px;right:20px;font-size:32px;cursor:pointer;color:#b388ff;}
+
+  /* RESPONSIVE DESIGN (MÓVILES Y TABLETAS) */
+  @media (max-width: 768px) {
+    header {
+      padding: 12px 20px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .logo-area {
+      text-align: center;
+    }
+    nav {
+      gap: 15px;
+    }
+    .hero {
+      padding: 40px 20px;
+      min-height: auto;
+    }
+    h1 {
+      font-size: 2.5rem;
+    }
+    .hero-text p {
+      font-size: 0.95rem;
+    }
+    #esfera3d {
+      width: 250px;
+      height: 250px;
+    }
+    section {
+      padding: 40px 20px;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .card {
+      font-size: 1.4rem;
+      padding: 15px;
+    }
+    .botones {
+      flex-direction: column;
+      width: 100%;
+    }
+    .btn {
+      width: 100%;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      font-size: 14px;
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    th, td {
+      padding: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+<div class="stars" id="stars"></div>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-text">
+      <div class="nombre">PERLA DEL ULÚA</div>
+      <div class="lema">BACHILLERATO TECNICO PROFESIONAL EN INFORMÁTICA </div>
+    </div>
+  </div>
+  <nav>
+    <a onclick="scrollTo('hero')">Inicio</a>
+    <a onclick="scrollTo('porque')">¿Por Qué?</a>
+    <a onclick="scrollTo('horarios')">Horarios</a>
+  </nav>
+</header>
+
+<main class="hero" id="hero">
+  <div class="hero-text">
+    <span class="badge">INSTITUTO OFICIAL PERLA DEL ULÚA - BTPI INFORMÁTICA</span>
+    <h1>CARRERA DE INFORMÁTICA</h1>
+    <p>Formamos Bachilleres Técnicos Profesionales en Informática con valores, ética y excelencia académica. 3 años de preparación para el futuro digital.</p>
+    <div class="botones">
+      <button class="btn btn-morada" onclick="abrirModalMaterias()">📚 Ver Materias</button>
+      <button class="btn btn-azul" onclick="abrirModalRegistro('alumno')">👤 Registro Alumnos</button>
+      <button class="btn btn-verde" onclick="abrirModalRegistro('docente')">📊 Registro Docentes</button>
+    </div>
+  </div>
+  <div><canvas id="esfera3d"></canvas></div>
+</main>
+
+<section class="stats">
+  <div class="card">3 AÑOS <span>Bachillerato Técnico</span></div>
+  <div class="card">70% <span>Práctica en Laboratorio</span></div>
+  <div class="card">SQL <span>Visual Studio, PC</span></div>
+  <div class="card">BTPI <span>Perla del Ulúa</span></div>
+</section>
+
+<section id="porque">
+  <h2>¿POR QUÉ ELEGIR INFORMÁTICA EN EL IPU?</h2>
+  <div class="info-box">
+    <h3>🏫 SOBRE NUESTRA CARRERA BTPI EN EL PERLA DEL ULÚA</h3>
+    <p>En el Instituto Oficial Perla del Ulúa formamos Bachilleres Técnicos Profesionales en Informática en 3 años. Contamos con laboratorios equipados y docentes capacitados.</p>
+    <p><b>Enfoque:</b> 70% Práctico + 30% Teórico. Bajo el lema "CIENCIA TRABAJO DESARROLLO" preparamos estudiantes para el mundo laboral.</p>
+    <p><b></b> El IPU es una institución reconocida en El Progreso, Yoro por su excelencia académica. En la carrera BTPI de Informática aprenderás desde cero: a programar en Visual Studio, crear bases de datos con SQL, dar mantenimiento a PC y configurar redes. Nuestros estudiantes representan al colegio en ferias científicas y olimpiadas. Al graduarte obtienes tu título de Bachiller Técnico y estás listo para trabajar o seguir a la universidad.</p>
+    <p><b>Metodología de Aprendizaje:</b> Nuestro modelo educativo combina tutorías personalizadas, proyectos prácticos grupales e individuales, evaluación continua orientada a proyectos integradores y talleres interactivos que simulan entornos laborales reales.</p>
+  </div>
+  <div class="info-box">
+    <h3>💎 7 Ventajas de Estudiar BTPI en el IPU</h3>
+    <ul>
+      <li><b>Tradición:</b> Años formando profesionales en El Progreso</li>
+      <li><b>Laboratorios:</b> Equipados con PC y software actual</li>
+      <li><b>Docentes:</b> Ingenieros y profesionales del área</li>
+      <li><b>Valores:</b> Ciencia, Trabajo y Desarrollo</li>
+      <li><b>Bolsa de Empleo:</b> Convenios con empresas locales</li>
+      <li><b>Ferias:</b> Participación en eventos científicos</li>
+      <li><b>Título:</b> Bachiller Técnico Profesional BTPI</li>
+    </ul>
+    <p style="margin-top:15px;"><b></b> Estudiar BTPI en el Perla del Ulúa significa pertenecer a una familia educativa comprometida con tu futuro. Aquí no solo aprendes informática, también desarrollas disciplina, responsabilidad y trabajo en equipo. Nuestros egresados trabajan en bancos, empresas, gobierno y muchos tienen sus propios negocios. La tecnología avanza y en el IOPU vamos a la par.</p>
+  </div>
+  <div class="info-box">
+    <h3>👨‍💼 Perfil del Egresado BTPI IPU</h3>
+    <ul>
+      <li>Programar aplicaciones con Visual Studio y C#</li>
+      <li>Administrar Bases de Datos con SQL Server</li>
+      <li>Dar mantenimiento y reparar equipos informáticos</li>
+      <li>Desarrollar páginas web y sistemas</li>
+      <li>Configurar redes y dar soporte técnico</li>
+      <li>Emprender su propia empresa de servicios</li>
+    </ul>
+    <p style="margin-top:15px;"><b></b> El egresado BTPI del IPU es un profesional íntegro. Domina las herramientas que pide el mercado: programación, redes, hardware y bases de datos. Además sale con la formación en valores del lema "CIENCIA TRABAJO DESARROLLO". Puedes trabajar de una vez o continuar estudiando Ingeniería en Sistemas. El puente amarillo de nuestro escudo representa la conexión entre el estudio y el éxito profesional.</p>
+    <p><b>Oportunidades de Empleo:</b> Al egresar podrás desempeñarte como Soporte Técnico, Administrador Junior de Redes, Desarrollador Web Freelance, Asistente de Sistemas, Gestor de Contenido Digital o Asesor Técnico de Ventas Informáticas.</p>
+  </div>
+</section>
+
+<section id="horarios">
+  <h2>Horario de Laboratorios - BTPI IPU</h2>
+  <div class="table-container">
+    <table>
+      <tr><th>Día</th><th>Materia Práctica</th><th>Laboratorio</th><th>Horario</th></tr>
+      <tr><td>Lunes</td><td>Mantenimiento y Reparación</td><td>Lab. Hardware</td><td>7:30 AM - 11:30 AM</td></tr>
+      <tr><td>Martes</td><td>Programación II</td><td>Lab. Visual Studio</td><td>7:30 AM - 11:30 AM</td></tr>
+      <tr><td>Miércoles</td><td>Desarrollo Web</td><td>Lab. Diseño</td><td>1:00 PM - 5:00 PM</td></tr>
+      <tr><td>Jueves</td><td>Redes Informáticas</td><td>Lab. Cisco</td><td>1:00 PM - 5:00 PM</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- MODAL MATERIAS -->
+<div id="modalMaterias" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarModalMaterias()">&times;</span>
+    <h2>📚 Plan de Estudios BTPI IPU - 6 Materias Técnicas</h2>
+    <div class="grid-1">
+      <div class="materia-card" onclick="abrirMateria('produccion')"><h3>📹 Producciones Digitales</h3><p>Edición de video, diseño gráfico y animación</p></div>
+      <div class="materia-card" onclick="abrirMateria('prog2')"><h3>💻 Programación II</h3><p>Programación Orientada a Objetos con C#</p></div>
+      <div class="materia-card" onclick="abrirMateria('web')"><h3>🌐 Desarrollo Web</h3><p>Creación de páginas web con HTML, CSS, JS</p></div>
+      <div class="materia-card" onclick="abrirMateria('redes')"><h3>🔌 Redes Informáticas</h3><p>Configuración y administración de redes</p></div>
+      <div class="materia-card" onclick="abrirMateria('gestion')"><h3>📊 Gestión Empresarial</h3><p>Administración de proyectos y empresas TI</p></div>
+      <div class="materia-card" onclick="abrirMateria('mantenimiento')"><h3>🔧 Mantenimiento y Reparación</h3><p>Soporte técnico de PC y equipos</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRO -->
+<div id="modalRegistro" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="cerrarModalRegistro()">&times;</span>
+    <h2 id="tituloRegistro"></h2>
+    <div class="form-box">
+      <label>Nombre Completo:</label>
+      <input type="text" id="nombreRegistro" placeholder="Ingrese su nombre completo">
+      <label>Foto:</label>
+      <input type="file" id="fotoRegistro" accept="image/*">
+      <button class="btn btn-morada" onclick="guardarRegistro()" style="width:100%;margin-top:10px;">Guardar Registro</button>
+    </div>
+    <div class="form-box">
+      <h3 style="color:#b388ff;margin-bottom:15px;">Lista de Registrados</h3>
+      <div class="lista-registro" id="listaRegistrados"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INFO MATERIA -->
+<div id="modalMateria" class="modal"><div class="modal-content"><span class="close" onclick="cerrarModalMateria()">&times;</span><h2 id="modal-titulo"></h2><div id="modal-body" style="line-height:1.8;margin-top:15px;"></div></div></div>
+
+<script>
+// FONDO 3D ESTRELLAS
+const sceneBg=new THREE.Scene();const cameraBg=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+const rendererBg=new THREE.WebGLRenderer({canvas:document.getElementById('bg3d'),alpha:true});rendererBg.setSize(window.innerWidth,window.innerHeight);
+const starsGeo=new THREE.BufferGeometry();const starsCount=2000;const posArray=new Float32Array(starsCount*3);
+for(let i=0;i<starsCount*3;i++){posArray[i]=(Math.random()-0.5)*10}
+starsGeo.setAttribute('position',new THREE.BufferAttribute(posArray,3));
+const starsMat=new THREE.PointsMaterial({size:0.02,color:0xb388ff});const starsMesh=new THREE.Points(starsGeo,starsMat);sceneBg.add(starsMesh);cameraBg.position.z=3;
+function animateBg(){requestAnimationFrame(animateBg);starsMesh.rotation.y+=0.0005;rendererBg.render(sceneBg,cameraBg);}animateBg();
+
+// ESTRELLITAS CSS
+for(let i=0;i<100;i++){let s=document.createElement('div');s.className='star';s.style.width=Math.random()*3+'px';s.style.height=s.style.width;s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';document.getElementById('stars').appendChild(s);}
+
+// ESFERA 3D
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(75,1,0.1,1000);
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('esfera3d'),alpha:true});renderer.setSize(350,350);
+const geo=new THREE.DodecahedronGeometry(1.8,1);const mat=new THREE.MeshBasicMaterial({color:0x4a0082,wireframe:true});
+const esfera=new THREE.Mesh(geo,mat);scene.add(esfera);camera.position.z=5;
+function animate(){requestAnimationFrame(animate);esfera.rotation.x+=0.008;esfera.rotation.y+=0.008;renderer.render(scene,camera);}animate();
+
+function scrollTo(id){document.getElementById(id).scrollIntoView();}
+
+// MODAL MATERIAS
+function abrirModalMaterias(){document.getElementById('modalMaterias').style.display='flex';}
+function cerrarModalMaterias(){document.getElementById('modalMaterias').style.display='none';}
+
+// MODAL REGISTRO
+let tipoActual='';
+function abrirModalRegistro(tipo){
+  tipoActual=tipo;
+  document.getElementById('tituloRegistro').innerText=tipo=='alumno'?'👤 Registro de Alumnos BTPI IPU':'📊 Registro de Docentes BTPI IPU';
+  document.getElementById('modalRegistro').style.display='flex';
+  cargarRegistros();
+}
+function cerrarModalRegistro(){document.getElementById('modalRegistro').style.display='none';}
+
+// MODAL INFO MATERIA
+function cerrarModalMateria(){document.getElementById('modalMateria').style.display='none';}
+function abrirMateria(m){
+  document.getElementById('modalMateria').style.display='flex';
+  const datos={
+    produccion:{t:'📹 Producciones Digitales',b:'<b>¿Qué es?</b><br>Materia donde aprendes a crear contenido digital profesional.<br><br><b>¿Qué se ve?</b><br>• Edición de video con Adobe Premiere<br>• Diseño Gráfico con Photoshop<br>• Animación 2D y 3D<br>• Motion Graphics<br><br><b>¿Qué se hace?</b><br>Videos, banners, logos y contenido multimedia para el IOPU.'},
+    prog2:{t:'💻 Programación II',b:'<b>¿Qué es?</b><br>Programación avanzada con Programación Orientada a Objetos.<br><br><b>¿Qué se ve?</b><br>• C# con Visual Studio 2022<br>• Clases, Objetos, Herencia<br>• Conexión a Bases de Datos SQL<br>• Formularios Windows<br><br><b>¿Qué se hace?</b><br>Sistemas de facturación, inventarios y control de notas.'},
+    web:{t:'🌐 Desarrollo Web',b:'<b>¿Qué es?</b><br>Creación de páginas web profesionales.<br><br><b>¿Qué se ve?</b><br>• HTML5, CSS3, JavaScript<br>• Diseño Responsivo<br>• XAMPP y MySQL<br><br><b>¿Qué se hace?</b><br>Página web del IOPU, portafolios y tiendas en línea.'},
+    redes:{t:'🔌 Redes Informáticas',b:'<b>¿Qué es?</b><br>Configurar y administrar redes de computadoras.<br><br><b>¿Qué se ve?</b><br>• Cableado Estructurado<br>• Router y Switch<br>• Servidores<br>• Seguridad<br><br><b>¿Qué se hace?</b><br>Red del IOPU, internet y soporte técnico.'},
+    gestion:{t:'📊 Gestión Empresarial',b:'<b>¿Qué es?</b><br>Administrar proyectos y empresas de tecnología.<br><br><b>¿Qué se ve?</b><br>• Planificación de Proyectos<br>• Costos y Presupuestos<br>• Emprendimiento<br><br><b>¿Qué se hace?</b><br>Plan de negocio y cotizaciones de servicios informáticos.'},
+    mantenimiento:{t:'🔧 Mantenimiento y Reparación',b:'<b>¿Qué es?</b><br>Soporte técnico de hardware y software.<br><br><b>¿Qué se ve?</b><br>• Partes de una PC<br>• Ensamblaje<br>• Instalación de Windows<br>• Diagnóstico<br><br><b>¿Qué se hace?</b><br>Reparar las PC del IOPU y dar mantenimiento.'}
+  }
+  document.getElementById('modal-titulo').innerText=datos[m].t;
+  document.getElementById('modal-body').innerHTML=datos[m].b;
+}
+
+// LOCALSTORAGE
+function guardarRegistro(){
+  let nombre=document.getElementById('nombreRegistro').value;
+  let fotoInput=document.getElementById('fotoRegistro').files[0];
+  if(nombre=='' ||!fotoInput){alert('Por favor ingrese nombre y foto');return;}
+  let reader=new FileReader();
+  reader.onload=function(e){
+    let registro={nombre:nombre,foto:e.target.result,fecha:new Date().toLocaleDateString()};
+    let datos=JSON.parse(localStorage.getItem(tipoActual+'s'))||[];
+    datos.push(registro);
+    localStorage.setItem(tipoActual+'s',JSON.stringify(datos));
+    document.getElementById('nombreRegistro').value='';
+    document.getElementById('fotoRegistro').value='';
+    cargarRegistros();
+  }
+  reader.readAsDataURL(fotoInput);
+}
+
+function cargarRegistros(){
+  let datos=JSON.parse(localStorage.getItem(tipoActual+'s'))||[];
+  document.getElementById('listaRegistrados').innerHTML='';
+  if(datos.length==0){document.getElementById('listaRegistrados').innerHTML='<p style="color:#888;">No hay registros aún</p>';return;}
+  datos.forEach(a=>{
+    document.getElementById('listaRegistrados').innerHTML+=`<div class="item-registro"><img src="${a.foto}"><div><b>${a.nombre}</b><br><small>Registrado: ${a.fecha}</small></div></div>`;
+  });
+}
+
+window.addEventListener('resize',()=>{rendererBg.setSize(window.innerWidth,window.innerHeight);cameraBg.aspect=window.innerWidth/window.innerHeight;cameraBg.updateProjectionMatrix();})
+</script>
+</body>
+</html>
